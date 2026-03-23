@@ -11,9 +11,6 @@ import api from '../services/api'
 const isRedTeam = (role) => role === 'red_team'
 
 // ─── Plain-English scenario content ──────────────────────────────────────────
-// Written so a complete beginner (or curious 5-year-old) gets it immediately.
-// Each scenario has: a story, a visual metaphor, and role-specific win paths.
-
 const SCENARIO_PLAIN = {
   brute_force: {
     emoji: '🔐',
@@ -196,46 +193,65 @@ const SCENARIO_PLAIN = {
   },
 }
 
-// ─── Step card ────────────────────────────────────────────────────────────────
-function StepCard({ step, index, color }) {
+// ─── Step card with improved visual hierarchy ────────────────────────────────
+function StepCard({ step, index, color, isLast }) {
   return (
     <motion.div
       initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: 0.1 + index * 0.08, duration: 0.3 }}
-      className="flex items-start gap-3"
+      transition={{ delay: 0.1 + index * 0.06, duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+      className="relative flex items-start gap-3.5 group"
     >
-      {/* Number + icon */}
-      <div className="shrink-0 flex flex-col items-center gap-0.5">
-        <div
-          className="w-8 h-8 rounded-full flex items-center justify-center text-base"
+      {/* Icon column with connector */}
+      <div className="relative shrink-0 flex flex-col items-center">
+        {/* Step icon */}
+        <motion.div
+          className="w-9 h-9 rounded-lg flex items-center justify-center text-lg relative z-10"
           style={{
-            background: `${color}15`,
-            border: `1px solid ${color}35`,
-            boxShadow: `0 0 10px ${color}15`,
+            background: `linear-gradient(135deg, ${color}12 0%, ${color}08 100%)`,
+            border: `1.5px solid ${color}28`,
+            boxShadow: `0 2px 8px ${color}10, inset 0 1px 0 ${color}15`,
           }}
+          whileHover={{ scale: 1.05 }}
+          transition={{ duration: 0.2 }}
         >
           {step.icon}
-        </div>
-        {index < 3 && (
-          <div className="w-px flex-1 mt-1" style={{ background: `${color}20`, height: '12px' }} />
+        </motion.div>
+        
+        {/* Connector line */}
+        {!isLast && (
+          <div 
+            className="w-0.5 h-full mt-1.5 absolute top-9"
+            style={{ 
+              background: `linear-gradient(180deg, ${color}25 0%, ${color}08 100%)`,
+            }} 
+          />
         )}
       </div>
 
-      {/* Text */}
-      <div
-        className="flex-1 pb-3"
-        style={{ borderBottom: index < 3 ? `1px solid rgba(255,255,255,0.04)` : 'none' }}
-      >
-        <div className="flex items-center gap-2 mb-0.5">
+      {/* Content */}
+      <div className="flex-1 pb-4">
+        {/* Step number badge */}
+        <div className="flex items-center gap-2 mb-1.5">
           <span
-            className="font-mono font-bold"
-            style={{ color: `${color}80`, fontSize: '9px', letterSpacing: '0.1em' }}
+            className="font-mono font-bold px-2 py-0.5 rounded"
+            style={{ 
+              color: `${color}90`, 
+              fontSize: '9px', 
+              letterSpacing: '0.12em',
+              background: `${color}10`,
+              border: `1px solid ${color}20`,
+            }}
           >
             STEP {index + 1}
           </span>
         </div>
-        <p className="font-mono text-sm leading-relaxed" style={{ color: '#c8d8e8' }}>
+        
+        {/* Step text */}
+        <p 
+          className="font-mono text-sm leading-relaxed" 
+          style={{ color: '#d8e8f8', lineHeight: '1.6' }}
+        >
           {step.text}
         </p>
       </div>
@@ -243,57 +259,95 @@ function StepCard({ step, index, color }) {
   )
 }
 
-// ─── Mistake pill ─────────────────────────────────────────────────────────────
-function MistakePill({ text, index }) {
+// ─── Mistake card with improved design ───────────────────────────────────────
+function MistakeCard({ text, index }) {
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.94 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: 0.35 + index * 0.07 }}
-      className="flex items-start gap-2.5 px-3 py-2.5 rounded"
-      style={{ background: 'rgba(255,34,68,0.06)', border: '1px solid rgba(255,34,68,0.15)' }}
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.3 + index * 0.05, ease: [0.25, 0.1, 0.25, 1] }}
+      className="flex items-start gap-3 px-4 py-3 rounded-lg group hover:scale-[1.01] transition-transform"
+      style={{ 
+        background: 'linear-gradient(135deg, rgba(255,34,68,0.06) 0%, rgba(255,34,68,0.03) 100%)', 
+        border: '1px solid rgba(255,34,68,0.18)',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+      }}
     >
-      <span style={{ color: '#ff4466', fontSize: '12px', marginTop: '1px' }}>✕</span>
-      <span className="font-mono text-xs leading-relaxed" style={{ color: '#8899aa' }}>{text}</span>
+      {/* Warning icon */}
+      <div 
+        className="shrink-0 w-6 h-6 rounded-md flex items-center justify-center text-xs"
+        style={{ 
+          background: 'rgba(255,34,68,0.12)',
+          border: '1px solid rgba(255,34,68,0.25)',
+          color: '#ff4466',
+        }}
+      >
+        ✕
+      </div>
+      
+      {/* Mistake text */}
+      <span 
+        className="font-mono text-xs leading-relaxed flex-1" 
+        style={{ color: '#b8c8d8', lineHeight: '1.5' }}
+      >
+        {text}
+      </span>
     </motion.div>
   )
 }
 
-// ─── VS Divider ───────────────────────────────────────────────────────────────
+// ─── VS Divider with improved visual balance ─────────────────────────────────
 function VsDivider({ attackerWin, defenderWin }) {
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
+      initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: 0.15 }}
-      className="flex items-stretch gap-0 rounded overflow-hidden"
-      style={{ border: '1px solid #0d1e30' }}
+      transition={{ delay: 0.15, duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+      className="flex items-stretch gap-0 rounded-lg overflow-hidden"
+      style={{ 
+        border: '1px solid #0d1e30',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+      }}
     >
       {/* Attacker side */}
       <div
-        className="flex-1 flex items-center gap-3 px-4 py-3"
-        style={{ background: 'rgba(255,34,68,0.06)' }}
+        className="flex-1 flex items-center gap-3 px-5 py-4"
+        style={{ background: 'linear-gradient(135deg, rgba(255,34,68,0.08) 0%, rgba(255,34,68,0.04) 100%)' }}
       >
-        <span className="text-xl shrink-0">💀</span>
-        <div>
-          <p className="font-mono font-bold" style={{ color: '#ff2244', fontSize: '9px', letterSpacing: '0.12em' }}>
+        <div 
+          className="shrink-0 w-10 h-10 rounded-lg flex items-center justify-center text-xl"
+          style={{
+            background: 'rgba(255,34,68,0.12)',
+            border: '1px solid rgba(255,34,68,0.25)',
+          }}
+        >
+          💀
+        </div>
+        <div className="flex-1">
+          <p className="font-mono font-bold mb-1" style={{ color: '#ff2244', fontSize: '10px', letterSpacing: '0.12em' }}>
             ATTACKER WINS BY
           </p>
-          <p className="font-mono text-xs mt-0.5" style={{ color: '#cc8899' }}>{attackerWin}</p>
+          <p className="font-mono text-sm leading-snug" style={{ color: '#e8a8b8', lineHeight: '1.4' }}>
+            {attackerWin}
+          </p>
         </div>
       </div>
 
       {/* VS center */}
       <div
-        className="shrink-0 flex items-center justify-center px-3"
-        style={{ background: '#060d1a', borderLeft: '1px solid #0d1e30', borderRight: '1px solid #0d1e30' }}
+        className="shrink-0 flex items-center justify-center px-4"
+        style={{ 
+          background: 'linear-gradient(180deg, #060d1a 0%, #04080f 100%)', 
+          borderLeft: '1px solid #0d1e30', 
+          borderRight: '1px solid #0d1e30',
+        }}
       >
         <span
           className="font-mono font-black"
           style={{
             color: '#1e3a52',
-            fontSize: '11px',
-            letterSpacing: '0.1em',
+            fontSize: '13px',
+            letterSpacing: '0.15em',
             writingMode: 'vertical-rl',
           }}
         >
@@ -303,47 +357,99 @@ function VsDivider({ attackerWin, defenderWin }) {
 
       {/* Defender side */}
       <div
-        className="flex-1 flex items-center gap-3 px-4 py-3"
-        style={{ background: 'rgba(0,212,255,0.05)' }}
+        className="flex-1 flex items-center gap-3 px-5 py-4"
+        style={{ background: 'linear-gradient(135deg, rgba(0,212,255,0.08) 0%, rgba(0,212,255,0.04) 100%)' }}
       >
-        <span className="text-xl shrink-0">🛡</span>
-        <div>
-          <p className="font-mono font-bold" style={{ color: '#00d4ff', fontSize: '9px', letterSpacing: '0.12em' }}>
+        <div 
+          className="shrink-0 w-10 h-10 rounded-lg flex items-center justify-center text-xl"
+          style={{
+            background: 'rgba(0,212,255,0.12)',
+            border: '1px solid rgba(0,212,255,0.25)',
+          }}
+        >
+          🛡
+        </div>
+        <div className="flex-1">
+          <p className="font-mono font-bold mb-1" style={{ color: '#00d4ff', fontSize: '10px', letterSpacing: '0.12em' }}>
             DEFENDER WINS BY
           </p>
-          <p className="font-mono text-xs mt-0.5" style={{ color: '#6699aa' }}>{defenderWin}</p>
+          <p className="font-mono text-sm leading-snug" style={{ color: '#a8d8e8', lineHeight: '1.4' }}>
+            {defenderWin}
+          </p>
         </div>
       </div>
     </motion.div>
   )
 }
 
-// ─── Main ─────────────────────────────────────────────────────────────────────
+// ─── Section header component ─────────────────────────────────────────────────
+function SectionHeader({ number, title, subtitle, color = '#1e3a52' }) {
+  return (
+    <div
+      className="flex items-center justify-between px-5 py-3"
+      style={{ 
+        background: `linear-gradient(135deg, ${color}12 0%, ${color}06 100%)`, 
+        borderBottom: `1px solid ${color}20`,
+      }}
+    >
+      <div className="flex items-center gap-3">
+        <span 
+          className="font-mono font-bold px-2 py-1 rounded"
+          style={{ 
+            color: `${color}90`, 
+            fontSize: '10px', 
+            letterSpacing: '0.15em',
+            background: `${color}15`,
+            border: `1px solid ${color}25`,
+          }}
+        >
+          {number}
+        </span>
+        <span 
+          className="font-mono font-bold tracking-wide" 
+          style={{ color: `${color}cc`, fontSize: '11px', letterSpacing: '0.08em' }}
+        >
+          {title}
+        </span>
+      </div>
+      {subtitle && (
+        <span className="font-mono text-xs" style={{ color: `${color}60` }}>
+          {subtitle}
+        </span>
+      )}
+    </div>
+  )
+}
+
+// ─── Main Component ───────────────────────────────────────────────────────────
 export default function TacticalBriefing() {
   const navigate = useNavigate()
   const { role, scenario, difficulty, gameId } = useMatchStore()
   const { user } = useAuthStore()
   const attacker = isRedTeam(role)
   const roleColor = attacker ? '#ff2244' : '#00d4ff'
-  const roleDim   = attacker ? 'rgba(255,34,68,0.08)' : 'rgba(0,212,255,0.06)'
 
   useGameSocket()
 
   const [briefing, setBriefing] = useState(null)
-  const [loading, setLoading]   = useState(true)
-  const [error, setError]       = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const resolvedRef = useRef(false)
 
-  useEffect(() => { if (!gameId) navigate('/dashboard', { replace: true }) }, [])
+  useEffect(() => { 
+    if (!gameId) navigate('/dashboard', { replace: true }) 
+  }, [gameId, navigate])
 
   useEffect(() => {
     if (!gameId) return
+    
     const resolve = (b) => {
       if (resolvedRef.current) return
       resolvedRef.current = true
       setBriefing(b)
       setLoading(false)
     }
+    
     const fail = (m) => {
       if (resolvedRef.current) return
       resolvedRef.current = true
@@ -363,61 +469,81 @@ export default function TacticalBriefing() {
     const onBriefing = ({ briefing: b }) => resolve(b)
     gameSocket.on('briefing', onBriefing)
     const t = setTimeout(() => fail('No briefing received — entering simulation'), 6000)
-    return () => { gameSocket.off('briefing', onBriefing); clearTimeout(t) }
+    
+    return () => { 
+      gameSocket.off('briefing', onBriefing)
+      clearTimeout(t) 
+    }
   }, [gameId])
 
   const handleComplete = () => navigate('/simulation')
 
   const scenarioKey = briefing?.scenarioType || scenario || ''
-  const plain       = SCENARIO_PLAIN[scenarioKey] || SCENARIO_PLAIN.brute_force
-  const steps       = attacker ? plain.attackerSteps  : plain.defenderSteps
-  const mistakes    = attacker ? plain.attackerMistakes : plain.defenderMistakes
-  const myStory     = attacker ? plain.attackerStory  : plain.defenderStory
+  const plain = SCENARIO_PLAIN[scenarioKey] || SCENARIO_PLAIN.brute_force
+  const steps = attacker ? plain.attackerSteps : plain.defenderSteps
+  const mistakes = attacker ? plain.attackerMistakes : plain.defenderMistakes
+  const myStory = attacker ? plain.attackerStory : plain.defenderStory
 
-  const difficultyColors = { easy: '#10b981', medium: '#f59e0b', hard: '#ff6600', elite: '#ff2244' }
-  const difficultyColor  = difficultyColors[difficulty] || '#f59e0b'
+  const difficultyColors = { 
+    easy: '#10b981', 
+    medium: '#f59e0b', 
+    hard: '#ff6600', 
+    elite: '#ff2244' 
+  }
+  const difficultyColor = difficultyColors[difficulty] || '#f59e0b'
 
   if (!gameId) return null
 
   return (
     <div
       className="min-h-screen"
-      style={{ background: 'linear-gradient(180deg, #060d1a 0%, #04080f 100%)', paddingTop: '72px' }}
+      style={{ 
+        background: 'linear-gradient(180deg, #060d1a 0%, #04080f 100%)', 
+        paddingTop: '80px',
+        paddingBottom: '40px',
+      }}
     >
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
+      <div className="max-w-3xl mx-auto px-6 space-y-5">
 
-        {/* ── Top status bar ── */}
+        {/* ── Status bar with better visual hierarchy ── */}
         <motion.div
-          initial={{ opacity: 0, y: -10 }}
+          initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-between px-4 py-2.5 rounded"
-          style={{ background: 'rgba(6,13,26,0.9)', border: '1px solid #0d1e30' }}
+          transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+          className="flex items-center justify-between px-5 py-3.5 rounded-xl"
+          style={{ 
+            background: 'rgba(6,13,26,0.95)', 
+            border: '1px solid #0d1e30',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+          }}
         >
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-3">
             <motion.div
-              className="w-2 h-2 rounded-full"
-              style={{ background: '#f59e0b' }}
-              animate={{ opacity: [1, 0.3, 1] }}
-              transition={{ duration: 1.2, repeat: Infinity }}
+              className="w-2.5 h-2.5 rounded-full"
+              style={{ background: '#f59e0b', boxShadow: '0 0 8px rgba(245,158,11,0.5)' }}
+              animate={{ opacity: [1, 0.4, 1] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
             />
-            <span className="font-mono text-xs tracking-widest" style={{ color: '#f59e0b', fontSize: '10px' }}>
-              MISSION BRIEFING
+            <span 
+              className="font-mono font-bold tracking-widest" 
+              style={{ color: '#f59e0b', fontSize: '11px' }}
+            >
+              TACTICAL BRIEFING
             </span>
-            <span style={{ color: '#0d1e30' }}>·</span>
-            <span className="font-mono text-xs" style={{ color: '#1e3a52' }}>
+            <span style={{ color: '#1e3a52' }}>·</span>
+            <span className="font-mono text-xs font-medium" style={{ color: '#4d6a83' }}>
               {scenarioKey.replace(/_/g, ' ').toUpperCase() || 'LOADING...'}
             </span>
           </div>
-          <div className="flex items-center gap-3">
+          
+          <div className="flex items-center gap-4">
             {difficulty && (
               <span
-                className="font-mono text-xs px-2 py-0.5"
+                className="font-mono font-bold text-xs px-3 py-1 rounded-md"
                 style={{
                   color: difficultyColor,
-                  border: `1px solid ${difficultyColor}40`,
-                  background: `${difficultyColor}08`,
-                  borderRadius: '2px',
-                  fontSize: '9px',
+                  border: `1.5px solid ${difficultyColor}50`,
+                  background: `${difficultyColor}10`,
                   letterSpacing: '0.1em',
                 }}
               >
@@ -435,273 +561,333 @@ export default function TacticalBriefing() {
           </div>
         </motion.div>
 
-        {/* ── Loading ── */}
-        {loading && (
-          <div className="flex flex-col items-center justify-center py-28 gap-4">
-            <div className="relative w-10 h-10">
-              <motion.div
-                className="absolute inset-0 rounded-full"
-                style={{ border: `2px solid ${roleColor}`, borderTopColor: 'transparent' }}
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-              />
-            </div>
-            <p className="font-mono text-xs tracking-widest" style={{ color: '#1e3a52' }}>
-              Receiving orders from command...
-            </p>
-          </div>
-        )}
-
-        {/* ── Error ── */}
-        {!loading && error && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="rounded p-8 text-center"
-            style={{ background: 'rgba(255,34,68,0.05)', border: '1px solid rgba(255,34,68,0.2)' }}
-          >
-            <p className="font-mono text-sm mb-4" style={{ color: '#ff6680' }}>⚠ {error}</p>
-            <motion.button
-              onClick={handleComplete}
-              className="font-mono text-xs px-8 py-2 rounded"
-              style={{
-                background: 'rgba(255,34,68,0.1)',
-                border: '1px solid rgba(255,34,68,0.4)',
-                color: '#ff2244',
-              }}
-              whileHover={{ background: 'rgba(255,34,68,0.18)' }}
-              whileTap={{ scale: 0.97 }}
-            >
-              ENTER SIMULATION →
-            </motion.button>
-          </motion.div>
-        )}
-
-        {/* ── Main briefing content ── */}
-        {!loading && (briefing || true) && !error && (
-          <div className="space-y-4">
-
-            {/* ── 1. What is this scenario? ── */}
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.05 }}
-              className="rounded overflow-hidden"
-              style={{ border: '1px solid #0d1e30' }}
-            >
-              {/* Header strip */}
-              <div
-                className="flex items-center gap-3 px-4 py-2"
-                style={{ background: '#060d1a', borderBottom: '1px solid #0d1e30' }}
-              >
-                <span style={{ color: '#1e3a52', fontSize: '9px', letterSpacing: '0.15em', fontFamily: 'monospace' }}>
-                  01 · WHAT'S HAPPENING
-                </span>
-              </div>
-
-              <div
-                className="px-5 py-5"
-                style={{ background: 'rgba(255,255,255,0.015)' }}
-              >
-                {/* Big emoji + title */}
-                <div className="flex items-center gap-4 mb-4">
-                  <div
-                    className="text-5xl w-20 h-20 flex items-center justify-center rounded-lg shrink-0"
-                    style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
-                  >
-                    {plain.emoji}
-                  </div>
-                  <div>
-                    <h1
-                      className="font-mono font-black mb-1"
-                      style={{ fontSize: '22px', color: '#e8f0f8', letterSpacing: '-0.01em', lineHeight: 1.2 }}
-                    >
-                      {plain.title}
-                    </h1>
-                    <p className="font-mono text-xs" style={{ color: '#2d4a62' }}>
-                      {scenarioKey.replace(/_/g, ' ')}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Plain story */}
-                <p
-                  className="font-mono text-sm leading-loose"
-                  style={{
-                    color: '#7899b0',
-                    background: 'rgba(255,255,255,0.02)',
-                    padding: '12px 16px',
-                    borderRadius: '4px',
-                    borderLeft: '2px solid #1e3a52',
-                    fontSize: '13px',
-                  }}
-                >
-                  {plain.story}
-                </p>
-              </div>
-            </motion.div>
-
-            {/* ── 2. Your role ── */}
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="rounded overflow-hidden"
-              style={{
-                border: `1px solid ${roleColor}25`,
-                background: roleDim,
-              }}
-            >
-              <div
-                className="flex items-center gap-3 px-4 py-2"
-                style={{ borderBottom: `1px solid ${roleColor}15`, background: `${roleColor}08` }}
-              >
-                <span style={{ color: `${roleColor}80`, fontSize: '9px', letterSpacing: '0.15em', fontFamily: 'monospace' }}>
-                  02 · YOUR ROLE
-                </span>
-              </div>
-
-              <div className="px-5 py-4">
-                <div className="flex items-center gap-3 mb-3">
-                  <span className="text-2xl">{attacker ? '💀' : '🛡'}</span>
-                  <div>
-                    <span
-                      className="font-mono font-black tracking-widest"
-                      style={{ color: roleColor, fontSize: '13px', letterSpacing: '0.12em' }}
-                    >
-                      {attacker ? 'YOU ARE THE ATTACKER' : 'YOU ARE THE DEFENDER'}
-                    </span>
-                    <p className="font-mono text-xs mt-0.5" style={{ color: `${roleColor}60` }}>
-                      {attacker ? 'Red Team · Offensive' : 'Blue Team · Defensive'}
-                    </p>
-                  </div>
-                </div>
-
-                <p
-                  className="font-mono text-sm leading-relaxed"
-                  style={{ color: '#a8c0d0', fontSize: '13px', lineHeight: '1.7' }}
-                >
-                  {myStory}
-                </p>
-              </div>
-            </motion.div>
-
-            {/* ── 3. Who wins how ── */}
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.13 }}
-              className="rounded overflow-hidden"
-              style={{ border: '1px solid #0d1e30' }}
-            >
-              <div
-                className="flex items-center gap-3 px-4 py-2"
-                style={{ background: '#060d1a', borderBottom: '1px solid #0d1e30' }}
-              >
-                <span style={{ color: '#1e3a52', fontSize: '9px', letterSpacing: '0.15em', fontFamily: 'monospace' }}>
-                  03 · HOW TO WIN
-                </span>
-              </div>
-              <div className="p-3" style={{ background: 'rgba(255,255,255,0.01)' }}>
-                <VsDivider attackerWin={plain.attackerWin} defenderWin={plain.defenderWin} />
-              </div>
-            </motion.div>
-
-            {/* ── 4. Your action plan ── */}
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.17 }}
-              className="rounded overflow-hidden"
-              style={{ border: `1px solid ${roleColor}20` }}
-            >
-              <div
-                className="flex items-center gap-3 px-4 py-2"
-                style={{
-                  background: `${roleColor}08`,
-                  borderBottom: `1px solid ${roleColor}15`,
-                }}
-              >
-                <span style={{ color: `${roleColor}70`, fontSize: '9px', letterSpacing: '0.15em', fontFamily: 'monospace' }}>
-                  04 · YOUR GAME PLAN
-                </span>
-                <span className="font-mono text-xs ml-auto" style={{ color: `${roleColor}50` }}>
-                  {attacker ? 'How to attack' : 'How to defend'}
-                </span>
-              </div>
-
-              <div className="px-5 py-4" style={{ background: 'rgba(255,255,255,0.01)' }}>
-                <div className="space-y-0">
-                  {steps.map((step, i) => (
-                    <StepCard key={i} step={step} index={i} color={roleColor} />
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-
-            {/* ── 5. Don't do this ── */}
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.22 }}
-              className="rounded overflow-hidden"
-              style={{ border: '1px solid rgba(255,34,68,0.15)' }}
-            >
-              <div
-                className="flex items-center gap-3 px-4 py-2"
-                style={{ background: 'rgba(255,34,68,0.04)', borderBottom: '1px solid rgba(255,34,68,0.1)' }}
-              >
-                <span style={{ color: 'rgba(255,34,68,0.5)', fontSize: '9px', letterSpacing: '0.15em', fontFamily: 'monospace' }}>
-                  05 · COMMON TRAPS — DON'T FALL FOR THESE
-                </span>
-              </div>
-              <div className="px-4 py-3 space-y-2" style={{ background: 'rgba(255,255,255,0.01)' }}>
-                {mistakes.map((m, i) => (
-                  <MistakePill key={i} text={m} index={i} />
-                ))}
-              </div>
-            </motion.div>
-
-            {/* ── Footer: player info + auto-start notice ── */}
+        {/* ── Loading state ── */}
+        <AnimatePresence mode="wait">
+          {loading && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              className="flex items-center justify-between px-4 py-3 rounded"
-              style={{ background: '#060d1a', border: '1px solid #0d1e30' }}
+              exit={{ opacity: 0 }}
+              className="flex flex-col items-center justify-center py-32 gap-5"
             >
-              <div className="flex items-center gap-2.5">
-                <div
-                  className="w-7 h-7 rounded flex items-center justify-center font-mono font-black text-xs"
-                  style={{ background: `${roleColor}18`, color: roleColor, border: `1px solid ${roleColor}30` }}
-                >
-                  {user?.username?.[0]?.toUpperCase() || 'O'}
-                </div>
-                <div>
-                  <p className="font-mono text-xs" style={{ color: '#3d5a73' }}>
-                    {user?.username || 'Operative'}
-                  </p>
-                  <p className="font-mono" style={{ color: roleColor, fontSize: '9px', letterSpacing: '0.08em' }}>
-                    {attacker ? '💀 Attacker' : '🛡 Defender'}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
+              <div className="relative w-12 h-12">
                 <motion.div
-                  className="w-1.5 h-1.5 rounded-full"
-                  style={{ background: '#f59e0b' }}
-                  animate={{ opacity: [1, 0.3, 1] }}
-                  transition={{ duration: 1, repeat: Infinity }}
+                  className="absolute inset-0 rounded-full"
+                  style={{ border: `3px solid ${roleColor}`, borderTopColor: 'transparent' }}
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
                 />
-                <span className="font-mono" style={{ color: '#f59e0b', fontSize: '9px', letterSpacing: '0.08em' }}>
-                  SIMULATION STARTS WHEN TIMER ENDS
-                </span>
               </div>
+              <p className="font-mono text-sm tracking-wider" style={{ color: '#3d5a73' }}>
+                Receiving tactical orders...
+              </p>
             </motion.div>
+          )}
+        </AnimatePresence>
 
-          </div>
-        )}
+        {/* ── Error state ── */}
+        <AnimatePresence mode="wait">
+          {!loading && error && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="rounded-xl p-10 text-center"
+              style={{ 
+                background: 'linear-gradient(135deg, rgba(255,34,68,0.08) 0%, rgba(255,34,68,0.04) 100%)', 
+                border: '1px solid rgba(255,34,68,0.25)',
+                boxShadow: '0 4px 12px rgba(255,34,68,0.1)',
+              }}
+            >
+              <div className="mb-6">
+                <span className="text-4xl">⚠️</span>
+              </div>
+              <p className="font-mono text-sm mb-6" style={{ color: '#ff6680' }}>
+                {error}
+              </p>
+              <motion.button
+                onClick={handleComplete}
+                className="font-mono font-bold text-sm px-10 py-3 rounded-lg"
+                style={{
+                  background: 'rgba(255,34,68,0.15)',
+                  border: '1.5px solid rgba(255,34,68,0.4)',
+                  color: '#ff4466',
+                  letterSpacing: '0.05em',
+                }}
+                whileHover={{ background: 'rgba(255,34,68,0.22)', scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                ENTER SIMULATION →
+              </motion.button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* ── Main briefing content ── */}
+        <AnimatePresence mode="wait">
+          {!loading && (briefing || true) && !error && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="space-y-5"
+            >
+
+              {/* ── 1. Scenario overview with hero treatment ── */}
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.05, duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+                className="rounded-xl overflow-hidden"
+                style={{ 
+                  border: '1px solid #0d1e30',
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
+                }}
+              >
+                <SectionHeader number="01" title="THE SCENARIO" color="#1e3a52" />
+
+                <div className="px-6 py-6" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                  {/* Emoji + title section */}
+                  <div className="flex items-center gap-5 mb-5">
+                    <motion.div
+                      className="text-6xl w-24 h-24 flex items-center justify-center rounded-xl shrink-0"
+                      style={{ 
+                        background: 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)', 
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.05)',
+                      }}
+                      whileHover={{ scale: 1.05, rotate: 5 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      {plain.emoji}
+                    </motion.div>
+                    <div className="flex-1">
+                      <h1
+                        className="font-mono font-black mb-2"
+                        style={{ 
+                          fontSize: '28px', 
+                          color: '#f8fcff', 
+                          letterSpacing: '-0.02em', 
+                          lineHeight: 1.1,
+                          textShadow: '0 2px 8px rgba(0,0,0,0.3)',
+                        }}
+                      >
+                        {plain.title}
+                      </h1>
+                      <p className="font-mono text-sm" style={{ color: '#4d6a83' }}>
+                        {scenarioKey.replace(/_/g, ' ')}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Story description */}
+                  <div
+                    className="px-5 py-4 rounded-lg"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.02) 100%)',
+                      borderLeft: '3px solid #2d4a62',
+                    }}
+                  >
+                    <p
+                      className="font-mono text-base leading-loose"
+                      style={{ color: '#a8c8d8', lineHeight: '1.7' }}
+                    >
+                      {plain.story}
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* ── 2. Your role with clear visual identity ── */}
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1, duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+                className="rounded-xl overflow-hidden"
+                style={{
+                  border: `1.5px solid ${roleColor}30`,
+                  boxShadow: `0 4px 16px ${roleColor}15`,
+                }}
+              >
+                <SectionHeader 
+                  number="02" 
+                  title="YOUR MISSION" 
+                  subtitle={attacker ? 'Red Team' : 'Blue Team'}
+                  color={roleColor} 
+                />
+
+                <div 
+                  className="px-6 py-5"
+                  style={{ 
+                    background: `linear-gradient(135deg, ${roleColor}08 0%, ${roleColor}03 100%)`,
+                  }}
+                >
+                  {/* Role badge */}
+                  <div className="flex items-center gap-4 mb-4">
+                    <div
+                      className="w-14 h-14 rounded-xl flex items-center justify-center text-3xl shrink-0"
+                      style={{
+                        background: `${roleColor}15`,
+                        border: `1.5px solid ${roleColor}35`,
+                        boxShadow: `0 4px 12px ${roleColor}20`,
+                      }}
+                    >
+                      {attacker ? '💀' : '🛡'}
+                    </div>
+                    <div>
+                      <span
+                        className="font-mono font-black tracking-wider block mb-1"
+                        style={{ color: roleColor, fontSize: '15px', letterSpacing: '0.1em' }}
+                      >
+                        {attacker ? 'ATTACKER' : 'DEFENDER'}
+                      </span>
+                      <span className="font-mono text-xs" style={{ color: `${roleColor}70` }}>
+                        {attacker ? 'Red Team · Offensive Operations' : 'Blue Team · Defensive Operations'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Mission description */}
+                  <p
+                    className="font-mono text-base leading-relaxed px-5 py-4 rounded-lg"
+                    style={{ 
+                      color: '#d8e8f8', 
+                      lineHeight: '1.7',
+                      background: 'rgba(255,255,255,0.03)',
+                      borderLeft: `3px solid ${roleColor}`,
+                    }}
+                  >
+                    {myStory}
+                  </p>
+                </div>
+              </motion.div>
+
+              {/* ── 3. Victory conditions ── */}
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15, duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+                className="rounded-xl overflow-hidden"
+                style={{ 
+                  border: '1px solid #0d1e30',
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
+                }}
+              >
+                <SectionHeader number="03" title="VICTORY CONDITIONS" color="#1e3a52" />
+                <div className="p-5" style={{ background: 'rgba(255,255,255,0.01)' }}>
+                  <VsDivider attackerWin={plain.attackerWin} defenderWin={plain.defenderWin} />
+                </div>
+              </motion.div>
+
+              {/* ── 4. Tactical playbook ── */}
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+                className="rounded-xl overflow-hidden"
+                style={{ 
+                  border: `1.5px solid ${roleColor}25`,
+                  boxShadow: `0 4px 16px ${roleColor}12`,
+                }}
+              >
+                <SectionHeader 
+                  number="04" 
+                  title="TACTICAL PLAYBOOK" 
+                  subtitle={attacker ? 'Attack Strategy' : 'Defense Strategy'}
+                  color={roleColor} 
+                />
+
+                <div className="px-6 py-5 space-y-1" style={{ background: 'rgba(255,255,255,0.015)' }}>
+                  {steps.map((step, i) => (
+                    <StepCard 
+                      key={i} 
+                      step={step} 
+                      index={i} 
+                      color={roleColor} 
+                      isLast={i === steps.length - 1}
+                    />
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* ── 5. Common mistakes ── */}
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.25, duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+                className="rounded-xl overflow-hidden"
+                style={{ 
+                  border: '1px solid rgba(255,34,68,0.2)',
+                  boxShadow: '0 4px 16px rgba(255,34,68,0.1)',
+                }}
+              >
+                <SectionHeader 
+                  number="05" 
+                  title="COMMON MISTAKES" 
+                  subtitle="Avoid these"
+                  color="rgba(255,34,68,0.8)" 
+                />
+                <div className="px-5 py-4 space-y-3" style={{ background: 'rgba(255,255,255,0.01)' }}>
+                  {mistakes.map((m, i) => (
+                    <MistakeCard key={i} text={m} index={i} />
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* ── Footer: Operator info + auto-start ── */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.35, duration: 0.4 }}
+                className="flex items-center justify-between px-5 py-4 rounded-xl"
+                style={{ 
+                  background: 'rgba(6,13,26,0.95)', 
+                  border: '1px solid #0d1e30',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                }}
+              >
+                <div className="flex items-center gap-3">
+                  <motion.div
+                    className="w-10 h-10 rounded-lg flex items-center justify-center font-mono font-black text-base"
+                    style={{ 
+                      background: `${roleColor}20`, 
+                      color: roleColor, 
+                      border: `1.5px solid ${roleColor}40`,
+                      boxShadow: `0 2px 8px ${roleColor}20`,
+                    }}
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    {user?.username?.[0]?.toUpperCase() || 'O'}
+                  </motion.div>
+                  <div>
+                    <p className="font-mono font-medium text-sm" style={{ color: '#7899b0' }}>
+                      {user?.username || 'Operative'}
+                    </p>
+                    <p className="font-mono text-xs" style={{ color: `${roleColor}90`, letterSpacing: '0.05em' }}>
+                      {attacker ? '💀 Attacker' : '🛡 Defender'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2.5">
+                  <motion.div
+                    className="w-2 h-2 rounded-full"
+                    style={{ background: '#f59e0b', boxShadow: '0 0 8px rgba(245,158,11,0.5)' }}
+                    animate={{ opacity: [1, 0.3, 1] }}
+                    transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+                  />
+                  <span 
+                    className="font-mono font-medium text-xs" 
+                    style={{ color: '#f59e0b', letterSpacing: '0.05em' }}
+                  >
+                    AUTO-START WHEN TIMER ENDS
+                  </span>
+                </div>
+              </motion.div>
+
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   )

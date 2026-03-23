@@ -47,9 +47,9 @@ export default function MatchFound() {
       {/* Flash effect */}
       <motion.div
         className="fixed inset-0 pointer-events-none z-50"
-        initial={{ opacity: 1, background: 'white' }}
+        initial={{ opacity: 1, background: 'lightgray' }}
         animate={{ opacity: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 1, ease: 'easeOut' }}
       />
 
       <div className="relative text-center w-full max-w-4xl px-4">
