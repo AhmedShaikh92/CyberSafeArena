@@ -230,7 +230,7 @@ export default function SystemStatusHUD({ status = {} }) {
           />
           <span
             className="font-mono text-xs tracking-widest"
-            style={{ color: '#1e3a52', fontSize: '9px', letterSpacing: '0.18em' }}
+            style={{ color: '#284965', fontSize: '9px', letterSpacing: '0.18em' }}
           >
             SYS STATUS
           </span>
@@ -259,12 +259,12 @@ export default function SystemStatusHUD({ status = {} }) {
         style={{ borderBottom: '1px solid #0a1828' }}
       >
         <div className="flex justify-between items-center mb-2">
-          <span className="font-mono" style={{ color: '#1e3a52', fontSize: '9px', letterSpacing: '0.1em' }}>
+          <span className="font-mono" style={{ color: '#284965', fontSize: '9px', letterSpacing: '0.1em' }}>
             VULNERABILITIES PATCHED
           </span>
           <span className="font-mono font-bold tabular-nums" style={{ color: postureCfg.color, fontSize: '11px' }}>
             {vulnsFound}
-            <span style={{ color: '#1e3a52' }}>/{vulnsTotal}</span>
+            <span style={{ color: '#284965' }}>/{vulnsTotal}</span>
           </span>
         </div>
         {/* Segmented bar */}
@@ -296,7 +296,7 @@ export default function SystemStatusHUD({ status = {} }) {
       {/* ── Metrics ── */}
       <div
         className="relative z-10 flex-1 overflow-y-auto min-h-0 px-2 py-2 space-y-1"
-        style={{ scrollbarWidth: 'thin', scrollbarColor: '#0a1828 transparent' }}
+        style={{ scrollbarWidth: 'thin', scrollbarColor: '#284965 transparent' }}
       >
         <SectionLabel>CORE METRICS</SectionLabel>
         {BASE_METRICS.map(metric => (

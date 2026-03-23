@@ -1,21 +1,29 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useAuthStore } from '../store/authStore'
 
 export default function Login() {
   const navigate = useNavigate()
-  const { login, isLoading, error, clearError } = useAuthStore()
-  const [form, setForm] = useState({ email: '', password: '' })
+  const { login, isLoading, clearError } = useAuthStore()
+  const [form,    setForm]    = useState({ email: '', password: '' })
   const [focused, setFocused] = useState(null)
+  const [error,   setError]   = useState(null)  // local error — not from store
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    e.stopPropagation()
+    setError(null)
     const result = await login(form.email, form.password)
-    if (result.success) navigate('/dashboard')
+    if (result?.success) {
+      navigate('/dashboard')
+    } else {
+      setError(result?.error || 'Invalid credentials')
+    }
   }
 
   const handleChange = (e) => {
+    setError(null)
     clearError()
     setForm({ ...form, [e.target.name]: e.target.value })
   }
@@ -59,29 +67,32 @@ export default function Login() {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Email */}
           <div>
-            <label className="block text-xs font-mono text-arena-muted mb-1.5 tracking-wider">EMAIL ADDRESS</label>
-            <div className="relative">
-              <input
-                type="email"
-                name="email"
-                value={form.email}
-                onChange={handleChange}
-                onFocus={() => setFocused('email')}
-                onBlur={() => setFocused(null)}
-                required
-                className="w-full bg-black/40 border rounded-sm px-4 py-3 text-sm font-mono text-white outline-none transition-all duration-200"
-                style={{
-                  borderColor: focused === 'email' ? '#00d4ff' : '#1e293b',
-                  boxShadow: focused === 'email' ? '0 0 15px #00d4ff20, inset 0 0 10px #00d4ff08' : 'none',
-                }}
-                placeholder="operator@arena.net"
-              />
-            </div>
+            <label className="block text-xs font-mono text-arena-muted mb-1.5 tracking-wider">
+              EMAIL ADDRESS
+            </label>
+            <input
+              type="email"
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+              onFocus={() => setFocused('email')}
+              onBlur={() => setFocused(null)}
+              required
+              autoComplete="email"
+              className="w-full bg-black/40 border rounded-sm px-4 py-3 text-sm font-mono text-white outline-none transition-all duration-200"
+              style={{
+                borderColor: error ? '#ff224460' : focused === 'email' ? '#00d4ff' : '#1e293b',
+                boxShadow:   focused === 'email' ? '0 0 15px #00d4ff20, inset 0 0 10px #00d4ff08' : 'none',
+              }}
+              placeholder="operator@arena.net"
+            />
           </div>
 
           {/* Password */}
           <div>
-            <label className="block text-xs font-mono text-arena-muted mb-1.5 tracking-wider">ACCESS KEY</label>
+            <label className="block text-xs font-mono text-arena-muted mb-1.5 tracking-wider">
+              ACCESS KEY
+            </label>
             <input
               type="password"
               name="password"
@@ -90,34 +101,40 @@ export default function Login() {
               onFocus={() => setFocused('password')}
               onBlur={() => setFocused(null)}
               required
+              autoComplete="current-password"
               className="w-full bg-black/40 border rounded-sm px-4 py-3 text-sm font-mono text-white outline-none transition-all duration-200"
               style={{
-                borderColor: focused === 'password' ? '#00d4ff' : '#1e293b',
-                boxShadow: focused === 'password' ? '0 0 15px #00d4ff20, inset 0 0 10px #00d4ff08' : 'none',
+                borderColor: error ? '#ff224460' : focused === 'password' ? '#00d4ff' : '#1e293b',
+                boxShadow:   focused === 'password' ? '0 0 15px #00d4ff20, inset 0 0 10px #00d4ff08' : 'none',
               }}
               placeholder="••••••••••••"
             />
           </div>
 
           {/* Error */}
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, y: -5 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-xs font-mono px-3 py-2 rounded-sm"
-              style={{ background: '#ff224415', border: '1px solid #ff224440', color: '#ff2244' }}
-            >
-              ⚠ {error}
-            </motion.div>
-          )}
+          <AnimatePresence>
+            {error && (
+              <motion.div
+                key="error"
+                initial={{ opacity: 0, y: -5, height: 0 }}
+                animate={{ opacity: 1, y: 0, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+                className="text-xs font-mono px-3 py-2 rounded-sm overflow-hidden"
+                style={{ background: '#ff224415', border: '1px solid #ff224440', color: '#ff2244' }}
+              >
+                ⚠ {error}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Submit */}
           <motion.button
             type="submit"
             disabled={isLoading}
             className="btn-primary w-full rounded-sm mt-2"
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.99 }}
+            whileHover={{ scale: isLoading ? 1 : 1.01 }}
+            whileTap={{ scale: isLoading ? 1 : 0.99 }}
           >
             {isLoading ? (
               <span className="flex items-center justify-center gap-2">
@@ -141,7 +158,6 @@ export default function Login() {
         </div>
       </div>
 
-      {/* Footer note */}
       <p className="text-center text-xs text-arena-muted mt-4 font-mono opacity-50">
         All sessions are monitored and logged
       </p>

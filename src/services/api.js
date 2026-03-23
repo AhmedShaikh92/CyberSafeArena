@@ -8,19 +8,28 @@ const api = axios.create({
   },
 })
 
+// Auth routes return 401 for wrong credentials — that's expected, not a
+// session expiry. Only redirect to login if the 401 comes from a protected
+// route (i.e. NOT an /auth/ endpoint).
+const AUTH_ROUTES = ['/auth/login', '/auth/register']
+
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Only force-logout if we actually had a token — not during startup
-      // race conditions where the header wasn't set yet
-      const hasToken = !!api.defaults.headers.common['Authorization']
-      if (hasToken) {
-        delete api.defaults.headers.common['Authorization']
-        localStorage.removeItem('cybersafe-auth')
-        window.location.href = '/login'
-      }
+  async (error) => {
+    const url = error.config?.url ?? ''
+    const isAuthRoute = AUTH_ROUTES.some((r) => url.includes(r))
+
+    if (error.response?.status === 401 && !isAuthRoute) {
+      // Token expired or invalid on a protected route — clear and redirect
+      delete api.defaults.headers.common['Authorization']
+      localStorage.removeItem('cybersafe-auth')
+
+      const { useAuthStore } = await import('../store/authStore')
+      useAuthStore.getState().logout()
+
+      window.location.href = '/login'
     }
+
     return Promise.reject(error)
   }
 )
