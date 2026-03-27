@@ -8,43 +8,37 @@ import RoleBadge from '../components/RoleBadge'
 export default function MatchFound() {
   const navigate = useNavigate()
   const { opponent, role, scenario, difficulty } = useMatchStore()
-  const { user: authUser } = useAuthStore()                    // removed duplicate useMatchStore().user
-  const [countdown, setCountdown] = useState(5)
-  const [showVs, setShowVs] = useState(false)
-  const [shouldNavigate, setShouldNavigate] = useState(false) // flag — never call navigate() inside setState
+  const { user: authUser } = useAuthStore()
+  const [countdown, setCountdown]       = useState(5)
+  const [showVs, setShowVs]             = useState(false)
+  const [shouldNavigate, setShouldNavigate] = useState(false)
 
-  // Backend role values are 'red_team' | 'blue_team'
   const isAttacker   = role === 'red_team'
   const opponentRole = isAttacker ? 'blue_team' : 'red_team'
 
   useEffect(() => {
-    const timer = setTimeout(() => setShowVs(true), 500)
-    return () => clearTimeout(timer)
+    const t = setTimeout(() => setShowVs(true), 500)
+    return () => clearTimeout(t)
   }, [])
 
   useEffect(() => {
     if (!showVs) return
     const interval = setInterval(() => {
       setCountdown((c) => {
-        if (c <= 1) {
-          clearInterval(interval)
-          setShouldNavigate(true) // set flag, don't navigate inside setState updater
-          return 0
-        }
+        if (c <= 1) { clearInterval(interval); setShouldNavigate(true); return 0 }
         return c - 1
       })
     }, 1000)
     return () => clearInterval(interval)
   }, [showVs])
 
-  // Navigate in its own effect so it never fires during a render cycle
   useEffect(() => {
     if (shouldNavigate) navigate('/briefing')
   }, [shouldNavigate])
 
   return (
-    <div className="min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Flash effect */}
+    <div className="min-h-screen flex items-center justify-center overflow-hidden px-4">
+      {/* Flash */}
       <motion.div
         className="fixed inset-0 pointer-events-none z-50"
         initial={{ opacity: 1, background: 'lightgray' }}
@@ -52,16 +46,17 @@ export default function MatchFound() {
         transition={{ duration: 1, ease: 'easeOut' }}
       />
 
-      <div className="relative text-center w-full max-w-4xl px-4">
-        {/* Match Found header */}
-        <motion.div
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
-        >
+      <div className="relative text-center w-full max-w-4xl">
+
+        {/* Header */}
+        <motion.div initial={{ opacity: 0, y: -30 }} animate={{ opacity: 1, y: 0 }} className="mb-6 sm:mb-8">
           <motion.h1
-            className="font-display text-4xl font-black tracking-widest"
-            style={{ color: '#f59e0b', textShadow: '0 0 20px #f59e0b, 0 0 60px #f59e0b40' }}
+            className="font-display font-black tracking-widest"
+            style={{
+              fontSize: 'clamp(24px, 8vw, 48px)',
+              color: '#f59e0b',
+              textShadow: '0 0 20px #f59e0b, 0 0 60px #f59e0b40',
+            }}
             animate={{
               textShadow: [
                 '0 0 20px #f59e0b, 0 0 60px #f59e0b40',
@@ -73,12 +68,11 @@ export default function MatchFound() {
           >
             MATCH FOUND
           </motion.h1>
+
           {scenario && (
-            <p className="text-sm font-mono text-arena-muted mt-2 tracking-wider">
+            <p className="text-xs sm:text-sm font-mono text-arena-muted mt-2 tracking-wider">
               SCENARIO:{' '}
-              <span className="text-white">
-                {scenario.replace(/_/g, ' ').toUpperCase()}
-              </span>
+              <span className="text-white">{scenario.replace(/_/g, ' ').toUpperCase()}</span>
               {difficulty && (
                 <> · <span className="text-yellow-500">{difficulty.toUpperCase()}</span></>
               )}
@@ -92,18 +86,19 @@ export default function MatchFound() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="flex items-center justify-center gap-8 mb-10"
+              className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 mb-8 sm:mb-10"
             >
               {/* You */}
               <motion.div
                 initial={{ x: -80, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-                className={`glass-panel rounded-sm p-6 text-center w-48 ${isAttacker ? 'glass-panel-red' : 'glass-panel-blue'}`}
+                className={`glass-panel rounded-sm p-5 sm:p-6 text-center w-full sm:w-48 ${isAttacker ? 'glass-panel-red' : 'glass-panel-blue'}`}
               >
                 <div
-                  className="w-16 h-16 mx-auto mb-3 rounded-sm flex items-center justify-center font-display text-3xl font-bold border-2"
+                  className="w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-3 rounded-sm flex items-center justify-center font-display font-bold border-2"
                   style={{
+                    fontSize: 'clamp(20px, 6vw, 28px)',
                     borderColor: isAttacker ? '#ff2244' : '#00d4ff',
                     color:       isAttacker ? '#ff2244' : '#00d4ff',
                     textShadow: `0 0 15px ${isAttacker ? '#ff2244' : '#00d4ff'}`,
@@ -112,20 +107,26 @@ export default function MatchFound() {
                 >
                   {authUser?.username?.[0]?.toUpperCase() || 'Y'}
                 </div>
-                <p className="font-mono font-bold text-white mb-2">{authUser?.username || 'You'}</p>
+                <p className="font-mono font-bold text-white mb-2 truncate">
+                  {authUser?.username || 'You'}
+                </p>
                 <RoleBadge role={role} size="sm" />
               </motion.div>
 
-              {/* VS */}
+              {/* VS — rotates on mobile to horizontal */}
               <motion.div
                 initial={{ scale: 0, rotate: 180 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 15, delay: 0.3 }}
-                className="text-center"
+                className="shrink-0"
               >
                 <div
-                  className="font-display text-5xl font-black"
-                  style={{ color: '#f59e0b', textShadow: '0 0 30px #f59e0b' }}
+                  className="font-display font-black"
+                  style={{
+                    fontSize: 'clamp(32px, 10vw, 56px)',
+                    color: '#f59e0b',
+                    textShadow: '0 0 30px #f59e0b',
+                  }}
                 >
                   VS
                 </div>
@@ -136,11 +137,12 @@ export default function MatchFound() {
                 initial={{ x: 80, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-                className={`glass-panel rounded-sm p-6 text-center w-48 ${!isAttacker ? 'glass-panel-red' : 'glass-panel-blue'}`}
+                className={`glass-panel rounded-sm p-5 sm:p-6 text-center w-full sm:w-48 ${!isAttacker ? 'glass-panel-red' : 'glass-panel-blue'}`}
               >
                 <div
-                  className="w-16 h-16 mx-auto mb-3 rounded-sm flex items-center justify-center font-display text-3xl font-bold border-2"
+                  className="w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-3 rounded-sm flex items-center justify-center font-display font-bold border-2"
                   style={{
+                    fontSize: 'clamp(20px, 6vw, 28px)',
                     borderColor: !isAttacker ? '#ff2244' : '#00d4ff',
                     color:       !isAttacker ? '#ff2244' : '#00d4ff',
                     textShadow: `0 0 15px ${!isAttacker ? '#ff2244' : '#00d4ff'}`,
@@ -149,8 +151,9 @@ export default function MatchFound() {
                 >
                   {opponent?.username?.[0]?.toUpperCase() || '?'}
                 </div>
-                <p className="font-mono font-bold text-white mb-2">{opponent?.username || 'Operator'}</p>
-                {/* Use backend role values — never 'attacker'/'defender' */}
+                <p className="font-mono font-bold text-white mb-2 truncate">
+                  {opponent?.username || 'Operator'}
+                </p>
                 <RoleBadge role={opponentRole} size="sm" />
                 {opponent?.levelName && (
                   <p className="text-xs text-arena-muted mt-1">{opponent.levelName}</p>
@@ -160,22 +163,22 @@ export default function MatchFound() {
           )}
         </AnimatePresence>
 
-        {/* Countdown to briefing */}
+        {/* Countdown */}
         {showVs && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-          >
-            <p className="text-sm font-mono text-arena-muted mb-3">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
+            <p className="text-xs sm:text-sm font-mono text-arena-muted mb-3 tracking-wider">
               ENTERING TACTICAL BRIEFING IN...
             </p>
             <motion.div
-              className="font-display text-6xl font-black tabular-nums"
+              className="font-display font-black tabular-nums"
               key={countdown}
               initial={{ scale: 1.3, opacity: 0.5 }}
               animate={{ scale: 1, opacity: 1 }}
-              style={{ color: '#00d4ff', textShadow: '0 0 30px #00d4ff' }}
+              style={{
+                fontSize: 'clamp(48px, 15vw, 80px)',
+                color: '#00d4ff',
+                textShadow: '0 0 30px #00d4ff',
+              }}
             >
               {countdown}
             </motion.div>

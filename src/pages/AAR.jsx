@@ -537,7 +537,7 @@ export default function AAR() {
   return (
     <div
       className="min-h-screen"
-      style={{ background: 'linear-gradient(180deg, #060d1a 0%, #040810 100%)', paddingTop: '68px' }}
+      style={{ background: 'linear-gradient(180deg, #060d1a 0%, #040810 100%)' }}
     >
       <div className="max-w-5xl mx-auto px-4 py-6 space-y-4">
 
