@@ -511,7 +511,6 @@ export default function Simulation() {
       <div
         className="shrink-0 flex items-center justify-between px-3 sm:px-4 py-2"
         style={{
-          marginTop: "56px",
           background: "rgba(6,13,26,0.95)",
           borderBottom: "1px solid #0d1e30",
           backdropFilter: "blur(12px)",

@@ -37,7 +37,7 @@ export default function Navbar() {
             >
               <span className="text-sm font-display font-bold neon-text-blue">CS</span>
             </div>
-            <span className="font-display font-bold text-sm tracking-widest neon-text-blue hidden sm:block">
+            <span className="font-display font-bold text-sm tracking-widest neon-text-blue block">
               CYBERSAFE<span className="neon-text-red ml-1">ARENA</span>
             </span>
           </Link>
