@@ -8,7 +8,7 @@ export default function Login() {
   const { login, isLoading, clearError } = useAuthStore()
   const [form,    setForm]    = useState({ email: '', password: '' })
   const [focused, setFocused] = useState(null)
-  const [error,   setError]   = useState(null)  // local error — not from store
+  const [error,   setError]   = useState(null)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -33,11 +33,12 @@ export default function Login() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
+      className="w-full max-w-sm mx-auto px-4 sm:px-0 overflow-hidden"
     >
       {/* Logo */}
-      <div className="text-center mb-8">
+      <div className="text-center mb-6 sm:mb-8">
         <motion.h1
-          className="font-display text-4xl font-black tracking-widest mb-2"
+          className="font-display text-2xl xs:text-3xl sm:text-4xl font-black tracking-widest mb-2 whitespace-nowrap scale-[0.85] xs:scale-90 sm:scale-100 origin-center"
           animate={{
             textShadow: [
               '0 0 20px #00d4ff, 0 0 60px #00d4ff40',
@@ -47,8 +48,10 @@ export default function Login() {
           }}
           transition={{ duration: 3, repeat: Infinity }}
         >
+          <span className='block text-4xl'>
           <span className="neon-text-blue">CYBER</span>
           <span className="neon-text-red">SAFE</span>
+          </span>
           <span className="neon-text-blue ml-2">ARENA</span>
         </motion.h1>
         <p className="text-arena-muted text-xs font-mono tracking-widest">
@@ -57,20 +60,26 @@ export default function Login() {
       </div>
 
       {/* Card */}
-      <div className="glass-panel rounded-sm p-8">
-        <div className="flex items-center gap-2 mb-6">
+      <div className="glass-panel rounded-sm p-5 sm:p-8">
+        <div className="flex items-center gap-2 mb-5 sm:mb-6">
           <div className="h-px flex-1 bg-arena-border" />
-          <span className="font-display text-xs tracking-widest text-arena-muted">OPERATOR LOGIN</span>
+          <span className="font-display text-xs tracking-widest text-arena-muted whitespace-nowrap">
+            OPERATOR LOGIN
+          </span>
           <div className="h-px flex-1 bg-arena-border" />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Email */}
           <div>
-            <label className="block text-xs font-mono text-arena-muted mb-1.5 tracking-wider">
+            <label
+              htmlFor="login-email"
+              className="block text-xs font-mono text-arena-muted mb-1.5 tracking-wider"
+            >
               EMAIL ADDRESS
             </label>
             <input
+              id="login-email"
               type="email"
               name="email"
               value={form.email}
@@ -79,10 +88,12 @@ export default function Login() {
               onBlur={() => setFocused(null)}
               required
               autoComplete="email"
-              className="w-full bg-black/40 border rounded-sm px-4 py-3 text-sm font-mono text-white outline-none transition-all duration-200"
+              inputMode="email"
+              className="w-full bg-black/40 border rounded-sm px-4 py-3 text-sm font-mono text-white outline-none transition-all duration-200 min-h-[48px]"
               style={{
                 borderColor: error ? '#ff224460' : focused === 'email' ? '#00d4ff' : '#1e293b',
                 boxShadow:   focused === 'email' ? '0 0 15px #00d4ff20, inset 0 0 10px #00d4ff08' : 'none',
+                fontSize: '16px', /* Prevents iOS auto-zoom on focus */
               }}
               placeholder="operator@arena.net"
             />
@@ -90,10 +101,14 @@ export default function Login() {
 
           {/* Password */}
           <div>
-            <label className="block text-xs font-mono text-arena-muted mb-1.5 tracking-wider">
+            <label
+              htmlFor="login-password"
+              className="block text-xs font-mono text-arena-muted mb-1.5 tracking-wider"
+            >
               ACCESS KEY
             </label>
             <input
+              id="login-password"
               type="password"
               name="password"
               value={form.password}
@@ -102,10 +117,11 @@ export default function Login() {
               onBlur={() => setFocused(null)}
               required
               autoComplete="current-password"
-              className="w-full bg-black/40 border rounded-sm px-4 py-3 text-sm font-mono text-white outline-none transition-all duration-200"
+              className="w-full bg-black/40 border rounded-sm px-4 py-3 text-sm font-mono text-white outline-none transition-all duration-200 min-h-[48px]"
               style={{
                 borderColor: error ? '#ff224460' : focused === 'password' ? '#00d4ff' : '#1e293b',
                 boxShadow:   focused === 'password' ? '0 0 15px #00d4ff20, inset 0 0 10px #00d4ff08' : 'none',
+                fontSize: '16px', /* Prevents iOS auto-zoom on focus */
               }}
               placeholder="••••••••••••"
             />
@@ -122,6 +138,8 @@ export default function Login() {
                 transition={{ duration: 0.2 }}
                 className="text-xs font-mono px-3 py-2 rounded-sm overflow-hidden"
                 style={{ background: '#ff224415', border: '1px solid #ff224440', color: '#ff2244' }}
+                role="alert"
+                aria-live="polite"
               >
                 ⚠ {error}
               </motion.div>
@@ -132,7 +150,7 @@ export default function Login() {
           <motion.button
             type="submit"
             disabled={isLoading}
-            className="btn-primary w-full rounded-sm mt-2"
+            className="btn-primary w-full rounded-sm mt-2 min-h-[48px] touch-manipulation"
             whileHover={{ scale: isLoading ? 1 : 1.01 }}
             whileTap={{ scale: isLoading ? 1 : 0.99 }}
           >
@@ -149,16 +167,17 @@ export default function Login() {
           </motion.button>
         </form>
 
-        <div className="mt-6 text-center">
-          <Link to="/register">
-            <span className="text-xs font-mono text-arena-muted hover:text-arena-defender transition-colors">
-              No operator account? <span className="neon-text-blue">REGISTER</span>
+        <div className="mt-5 sm:mt-6 text-center">
+          <Link to="/register" className="inline-block py-2 touch-manipulation">
+            <span className="text-xs font-mono text-arena-muted hover:text-arena-defender active:opacity-70 transition-colors">
+              No operator account?{' '}
+              <span className="neon-text-blue">REGISTER</span>
             </span>
           </Link>
         </div>
       </div>
 
-      <p className="text-center text-xs text-arena-muted mt-4 font-mono opacity-50">
+      <p className="text-center text-xs text-arena-muted mt-4 font-mono opacity-50 pb-safe">
         All sessions are monitored and logged
       </p>
     </motion.div>
